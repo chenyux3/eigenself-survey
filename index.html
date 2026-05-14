@@ -399,8 +399,9 @@
   <div class="screen" id="screen-result">
     <div class="result-card">
       <h2>完成 ✓</h2>
+      <p id="submitStatus" style="text-align:center;color:#999;font-size:13px;margin-bottom:8px"></p>
       <p style="text-align:center;color:#888;font-size:13px;margin-bottom:16px">
-        把下面的结果复制发给新就行了
+        也可以把下面的结果复制发给新
       </p>
       <div class="result-text" id="resultText"></div>
       <button class="btn btn-primary" onclick="copyResult()">复制结果</button>
@@ -649,6 +650,37 @@ function showResult() {
   text += `edges: {${Object.entries(edges).map(([k,v]) => `${k}:[${v.join(',')}]`).join(',')}}\n`;
   
   document.getElementById('resultText').textContent = text;
+  
+  // Auto-submit to Google Sheets
+  submitToSheet(rankByValue);
+}
+
+function submitToSheet(rankByValue) {
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzbHObe1y1lk3-lLYNGveVgbq6Dk6OfUQhJBT8oZE2mWqVoynOSlH6ZbVNxy2IWGPifUA/exec';
+  
+  const payload = {
+    name: userName,
+    date: new Date().toLocaleDateString('zh-CN'),
+    ranking: '[' + rankByValue.join(',') + ']',
+    edges: '{' + Object.entries(edges).map(([k,v]) => k + ':[' + v.join(',') + ']').join(',') + '}'
+  };
+  
+  const statusEl = document.getElementById('submitStatus');
+  statusEl.textContent = '正在提交...';
+  statusEl.style.color = '#999';
+  
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    statusEl.textContent = '已自动提交 ✓';
+    statusEl.style.color = '#16a34a';
+  }).catch(() => {
+    statusEl.textContent = '自动提交失败，请手动复制结果发给新';
+    statusEl.style.color = '#dc2626';
+  });
 }
 
 function copyResult() {
