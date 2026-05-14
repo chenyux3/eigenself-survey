@@ -653,19 +653,58 @@ function showResult() {
 
 function copyResult() {
   const text = document.getElementById('resultText').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const toast = document.getElementById('copyToast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
-  }).catch(() => {
-    // Fallback: select text
-    const el = document.getElementById('resultText');
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  });
+  
+  // Method 1: Modern clipboard API
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板 ✓')).catch(() => fallbackCopy(text));
+    return;
+  }
+  
+  // Method 2: textarea fallback (works in WeChat, HTTP, etc.)
+  fallbackCopy(text);
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  ta.style.top = '0';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length); // iOS needs this
+  
+  try {
+    const ok = document.execCommand('copy');
+    if (ok) {
+      showToast('已复制到剪贴板 ✓');
+    } else {
+      selectResultText();
+    }
+  } catch (e) {
+    selectResultText();
+  }
+  document.body.removeChild(ta);
+}
+
+function selectResultText() {
+  // Last resort: select text so user can manually copy
+  const el = document.getElementById('resultText');
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  showToast('已选中文字，请手动复制');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('copyToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
 function resetAll() {
