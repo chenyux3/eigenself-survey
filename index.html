@@ -662,45 +662,25 @@ function submitToSheet(rankByValue) {
   statusEl.textContent = '正在提交...';
   statusEl.style.color = '#999';
   
-  // Use hidden iframe + form — the only reliable cross-origin method for GAS
-  const iframeName = 'eigenself_submit_' + Date.now();
-  const iframe = document.createElement('iframe');
-  iframe.name = iframeName;
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
-  
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = SHEET_URL;
-  form.target = iframeName;
-  form.style.display = 'none';
-  
-  const fields = {
+  const params = new URLSearchParams({
     name: userName,
     date: new Date().toLocaleDateString('zh-CN'),
     ranking: '[' + rankByValue.join(',') + ']',
     edges: '{' + Object.entries(edges).map(([k,v]) => k + ':[' + v.join(',') + ']').join(',') + '}'
-  };
+  });
   
-  for (const [key, val] of Object.entries(fields)) {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = key;
-    input.value = val;
-    form.appendChild(input);
-  }
-  
-  document.body.appendChild(form);
-  form.submit();
-  
-  // Can't read iframe response cross-origin, so use a timeout
-  setTimeout(() => {
+  // Use image tag GET request - works everywhere, even WeChat
+  const img = new Image();
+  img.onload = function() {
     statusEl.textContent = '已提交 ✓';
     statusEl.style.color = '#16a34a';
-    // Cleanup
-    try { document.body.removeChild(form); } catch(e) {}
-    try { document.body.removeChild(iframe); } catch(e) {}
-  }, 3000);
+  };
+  img.onerror = function() {
+    // GAS returns text not image, so onerror fires but request still went through
+    statusEl.textContent = '已提交 ✓';
+    statusEl.style.color = '#16a34a';
+  };
+  img.src = SHEET_URL + '?' + params.toString();
 }
 
 function copyResult() {
