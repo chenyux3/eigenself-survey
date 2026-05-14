@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>EigenSelf — 你的价值观网络</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Noto Sans SC', -apple-system, sans-serif;
+    background: #f7f6f3;
+    color: #2d2d2d;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  
+  .app {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+  
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+  .header h1 {
+    font-family: 'Noto Serif SC', Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+  .header p {
+    font-size: 13px;
+    color: #999;
+    line-height: 1.6;
+  }
+  
+  /* Progress */
+  .progress-bar {
+    width: 100%;
+    height: 3px;
+    background: #e8e6e1;
+    border-radius: 2px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #2d2d2d;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  
+  /* Phase labels */
+  .phase-label {
+    font-size: 11px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+  
+  /* Intro screen */
+  .screen { display: none; }
+  .screen.active { display: block; }
+  
+  .intro-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .intro-card h2 {
+    font-family: 'Noto Serif SC', Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1a1a1a;
+  }
+  .intro-card p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+  
+  .name-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    font-family: 'Noto Sans SC', sans-serif;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    background: #fafaf8;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .name-input:focus {
+    border-color: #2d2d2d;
+  }
+  
+  /* Network step */
+  .network-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .current-value {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .current-value .label {
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 6px;
+  }
+  .current-value .value-name {
+    font-family: 'Noto Serif SC', Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  .current-value .value-en {
+    font-size: 12px;
+    color: #bbb;
+    margin-top: 2px;
+  }
+  .current-value .value-desc {
+    font-size: 13px;
+    color: #888;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  
+  .prompt-text {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .select-count {
+    font-size: 12px;
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  
+  .choice-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .choice-btn {
+    padding: 10px 18px;
+    font-size: 15px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 500;
+    border: 1.5px solid #e0ded9;
+    border-radius: 20px;
+    background: #fafaf8;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .choice-btn:active {
+    transform: scale(0.96);
+  }
+  .choice-btn.selected {
+    background: #2d2d2d;
+    color: #fff;
+    border-color: #2d2d2d;
+  }
+  .choice-btn.disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  
+  /* Rank step */
+  .rank-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .rank-instruction {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 6px;
+    line-height: 1.6;
+  }
+  .rank-subtext {
+    font-size: 12px;
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .rank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .rank-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1.5px solid #e8e6e1;
+    background: #fafaf8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .rank-item:active {
+    transform: scale(0.98);
+  }
+  .rank-item.ranked {
+    background: #2d2d2d;
+    border-color: #2d2d2d;
+    color: #fff;
+  }
+  .rank-item.ranked .rank-zh { color: #fff; }
+  .rank-item.ranked .rank-en { color: rgba(255,255,255,0.5); }
+  .rank-item.ranked .rank-num { background: rgba(255,255,255,0.2); color: #fff; }
+  .rank-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    background: #e8e6e1;
+    color: #999;
+    flex-shrink: 0;
+  }
+  .rank-zh {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+  }
+  .rank-en {
+    font-size: 11px;
+    color: #bbb;
+    margin-left: auto;
+  }
+  
+  /* Buttons */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: #2d2d2d;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background: #ccc;
+    cursor: default;
+  }
+  .btn-primary:disabled:active { transform: none; }
+  .btn-secondary {
+    background: transparent;
+    color: #999;
+    border: 1.5px solid #ddd;
+    margin-top: 8px;
+  }
+  
+  /* Result screen */
+  .result-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .result-card h2 {
+    font-family: 'Noto Serif SC', Georgia, serif;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .result-text {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #555;
+    background: #f7f6f3;
+    border-radius: 8px;
+    padding: 16px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin-bottom: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .copy-toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #2d2d2d;
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 20px;
+    font-size: 14px;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .copy-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  
+  /* Counter badge */
+  .step-counter {
+    text-align: center;
+    font-size: 12px;
+    color: #bbb;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>EigenSelf</h1>
+    <p>发现你真实的价值观结构</p>
+  </div>
+  
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  
+  <!-- Intro -->
+  <div class="screen active" id="screen-intro">
+    <div class="intro-card">
+      <h2>欢迎</h2>
+      <p>这个小测试会帮你画出自己的"价值观网络"——不只是你觉得什么重要，而是你实际上怎么思考这些价值观之间的关系。</p>
+      <p>总共两步，大约 3 分钟。</p>
+      <p style="font-size:13px;color:#aaa;margin-bottom:0">你的称呼（用于结果标注）</p>
+      <input class="name-input" id="nameInput" placeholder="输入你的名字或昵称" maxlength="20">
+      <button class="btn btn-primary" onclick="startNetwork()" id="startBtn" disabled>开始</button>
+    </div>
+  </div>
+  
+  <!-- Network phase -->
+  <div class="screen" id="screen-network">
+    <div class="phase-label">第一步 · 联想网络</div>
+    <div class="step-counter" id="netStep"></div>
+    <div class="network-card">
+      <div class="current-value">
+        <div class="label">当你想到</div>
+        <div class="value-name" id="curValueZh"></div>
+        <div class="value-en" id="curValueEn"></div>
+        <div class="value-desc" id="curValueDesc"></div>
+      </div>
+      <div class="prompt-text">你会联想到下面哪些？</div>
+      <div class="select-count" id="selectCount"></div>
+      <div class="choice-grid" id="choiceGrid"></div>
+      <button class="btn btn-primary" id="nextNetBtn" onclick="nextNetworkStep()" disabled>下一个</button>
+      <button class="btn btn-secondary" id="skipNetBtn" onclick="skipNetworkStep()">跳过（没有明显联想）</button>
+    </div>
+  </div>
+  
+  <!-- Rank phase -->
+  <div class="screen" id="screen-rank">
+    <div class="phase-label">第二步 · 重要性排序</div>
+    <div class="rank-card">
+      <div class="rank-instruction">按重要程度依次点击<br>先点 = 最重要</div>
+      <div class="rank-subtext" id="rankSubtext">点击你认为最重要的价值观</div>
+      <div class="rank-list" id="rankList"></div>
+      <button class="btn btn-secondary" onclick="undoRank()" id="undoBtn" style="display:none">撤销上一步</button>
+    </div>
+  </div>
+  
+  <!-- Result -->
+  <div class="screen" id="screen-result">
+    <div class="result-card">
+      <h2>完成 ✓</h2>
+      <p style="text-align:center;color:#888;font-size:13px;margin-bottom:16px">
+        把下面的结果复制发给新就行了
+      </p>
+      <div class="result-text" id="resultText"></div>
+      <button class="btn btn-primary" onclick="copyResult()">复制结果</button>
+      <button class="btn btn-secondary" onclick="resetAll()">重新来一次</button>
+    </div>
+  </div>
+</div>
+
+<div class="copy-toast" id="copyToast">已复制到剪贴板 ✓</div>
+
+<script>
+const VALUES = [
+  { zh: "自主", en: "Self-Direction", desc: "独立思考和行动的自由" },
+  { zh: "新鲜感", en: "Stimulation", desc: "追求新奇、挑战和探索" },
+  { zh: "享受", en: "Hedonism", desc: "享受生活中的愉悦和美好" },
+  { zh: "成就", en: "Achievement", desc: "通过努力获得认可和成功" },
+  { zh: "权力", en: "Power", desc: "对资源和他人的影响力" },
+  { zh: "安全", en: "Security", desc: "稳定、安全和可预测的生活" },
+  { zh: "守矩", en: "Conformity", desc: "克制自己以尊重社会规范" },
+  { zh: "传统", en: "Tradition", desc: "尊重和延续文化传承" },
+  { zh: "善待亲友", en: "Benevolence", desc: "关爱身边亲近的人" },
+  { zh: "博爱", en: "Universalism", desc: "包容和关怀所有人与世界" },
+];
+
+let userName = "";
+let edges = {};       // { 0: [2,3], 1: [0,4], ... }
+let ranking = [];     // [index, index, ...]
+let currentNetIdx = 0;
+let selectedForCurrent = [];
+
+// --- Init ---
+const nameInput = document.getElementById('nameInput');
+const startBtn = document.getElementById('startBtn');
+nameInput.addEventListener('input', () => {
+  startBtn.disabled = nameInput.value.trim().length === 0;
+});
+
+function setProgress(pct) {
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+// --- Network phase ---
+function startNetwork() {
+  userName = nameInput.value.trim();
+  if (!userName) return;
+  currentNetIdx = 0;
+  edges = {};
+  showScreen('network');
+  renderNetworkStep();
+  setProgress(5);
+}
+
+function renderNetworkStep() {
+  const v = VALUES[currentNetIdx];
+  document.getElementById('curValueZh').textContent = v.zh;
+  document.getElementById('curValueEn').textContent = v.en;
+  document.getElementById('curValueDesc').textContent = v.desc;
+  document.getElementById('netStep').textContent = `${currentNetIdx + 1} / 10`;
+  
+  selectedForCurrent = [];
+  updateSelectCount();
+  
+  const grid = document.getElementById('choiceGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < VALUES.length; i++) {
+    if (i === currentNetIdx) continue;
+    const btn = document.createElement('div');
+    btn.className = 'choice-btn';
+    btn.textContent = VALUES[i].zh;
+    btn.dataset.idx = i;
+    btn.addEventListener('click', () => toggleChoice(i, btn));
+    grid.appendChild(btn);
+  }
+  
+  document.getElementById('nextNetBtn').disabled = true;
+  document.getElementById('skipNetBtn').style.display = 'block';
+  
+  setProgress(5 + (currentNetIdx / 10) * 45);
+}
+
+function toggleChoice(idx, btn) {
+  const pos = selectedForCurrent.indexOf(idx);
+  if (pos >= 0) {
+    selectedForCurrent.splice(pos, 1);
+    btn.classList.remove('selected');
+  } else {
+    if (selectedForCurrent.length >= 3) return;
+    selectedForCurrent.push(idx);
+    btn.classList.add('selected');
+  }
+  
+  updateSelectCount();
+  document.getElementById('nextNetBtn').disabled = selectedForCurrent.length === 0;
+  
+  // Disable unselected buttons when 3 selected
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    const bIdx = parseInt(b.dataset.idx);
+    if (selectedForCurrent.length >= 3 && !selectedForCurrent.includes(bIdx)) {
+      b.classList.add('disabled');
+    } else {
+      b.classList.remove('disabled');
+    }
+  });
+}
+
+function updateSelectCount() {
+  const el = document.getElementById('selectCount');
+  el.textContent = `已选 ${selectedForCurrent.length}/3`;
+}
+
+function nextNetworkStep() {
+  if (selectedForCurrent.length > 0) {
+    edges[currentNetIdx] = [...selectedForCurrent];
+  }
+  advanceNetwork();
+}
+
+function skipNetworkStep() {
+  edges[currentNetIdx] = [];
+  advanceNetwork();
+}
+
+function advanceNetwork() {
+  currentNetIdx++;
+  if (currentNetIdx >= 10) {
+    startRanking();
+  } else {
+    renderNetworkStep();
+  }
+}
+
+// --- Ranking phase ---
+function startRanking() {
+  ranking = [];
+  showScreen('rank');
+  setProgress(55);
+  renderRankList();
+}
+
+function renderRankList() {
+  const list = document.getElementById('rankList');
+  list.innerHTML = '';
+  
+  for (let i = 0; i < VALUES.length; i++) {
+    const v = VALUES[i];
+    const rankPos = ranking.indexOf(i);
+    const isRanked = rankPos >= 0;
+    
+    const item = document.createElement('div');
+    item.className = 'rank-item' + (isRanked ? ' ranked' : '');
+    item.style.order = isRanked ? rankPos : 100 + i;
+    
+    const num = document.createElement('div');
+    num.className = 'rank-num';
+    num.textContent = isRanked ? (rankPos + 1) : '';
+    
+    const zh = document.createElement('span');
+    zh.className = 'rank-zh';
+    zh.textContent = v.zh;
+    
+    const en = document.createElement('span');
+    en.className = 'rank-en';
+    en.textContent = v.en;
+    
+    item.appendChild(num);
+    item.appendChild(zh);
+    item.appendChild(en);
+    
+    if (!isRanked) {
+      item.addEventListener('click', () => {
+        ranking.push(i);
+        onRankUpdate();
+      });
+    }
+    
+    list.appendChild(item);
+  }
+  
+  // Update subtext
+  const sub = document.getElementById('rankSubtext');
+  const undoBtn = document.getElementById('undoBtn');
+  if (ranking.length === 0) {
+    sub.textContent = '点击你认为最重要的价值观';
+    undoBtn.style.display = 'none';
+  } else if (ranking.length < 10) {
+    const ordinals = ['第一','第二','第三','第四','第五','第六','第七','第八','第九','第十'];
+    sub.textContent = `接下来选${ordinals[ranking.length]}重要的`;
+    undoBtn.style.display = 'block';
+  }
+  
+  setProgress(55 + (ranking.length / 10) * 40);
+}
+
+function onRankUpdate() {
+  if (ranking.length >= 10) {
+    showResult();
+  } else {
+    renderRankList();
+  }
+}
+
+function undoRank() {
+  if (ranking.length > 0) {
+    ranking.pop();
+    renderRankList();
+  }
+}
+
+// --- Result ---
+function showResult() {
+  setProgress(100);
+  showScreen('result');
+  
+  // Build ranking array: for each value index, what rank did it get
+  const rankByValue = Array(10).fill(0);
+  for (let r = 0; r < ranking.length; r++) {
+    rankByValue[ranking[r]] = r + 1;
+  }
+  
+  let text = `【EigenSelf 结果】\n`;
+  text += `姓名：${userName}\n`;
+  text += `日期：${new Date().toLocaleDateString('zh-CN')}\n\n`;
+  
+  text += `=== 价值排序 ===\n`;
+  for (let r = 0; r < ranking.length; r++) {
+    text += `${r+1}. ${VALUES[ranking[r]].zh}\n`;
+  }
+  
+  text += `\n=== 联想网络 ===\n`;
+  for (let i = 0; i < 10; i++) {
+    const targets = edges[i] || [];
+    if (targets.length > 0) {
+      text += `${VALUES[i].zh} → ${targets.map(t => VALUES[t].zh).join('、')}\n`;
+    } else {
+      text += `${VALUES[i].zh} → （无联想）\n`;
+    }
+  }
+  
+  text += `\n=== 原始数据 ===\n`;
+  text += `ranking: [${rankByValue.join(',')}]\n`;
+  text += `edges: {${Object.entries(edges).map(([k,v]) => `${k}:[${v.join(',')}]`).join(',')}}\n`;
+  
+  document.getElementById('resultText').textContent = text;
+}
+
+function copyResult() {
+  const text = document.getElementById('resultText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('copyToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }).catch(() => {
+    // Fallback: select text
+    const el = document.getElementById('resultText');
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  });
+}
+
+function resetAll() {
+  edges = {};
+  ranking = [];
+  currentNetIdx = 0;
+  selectedForCurrent = [];
+  nameInput.value = '';
+  startBtn.disabled = true;
+  setProgress(0);
+  showScreen('intro');
+}
+</script>
+</body>
+</html>
