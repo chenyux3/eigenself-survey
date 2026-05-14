@@ -662,25 +662,41 @@ function submitToSheet(rankByValue) {
   statusEl.textContent = '正在提交...';
   statusEl.style.color = '#999';
   
-  const params = new URLSearchParams({
-    name: userName,
-    date: new Date().toLocaleDateString('zh-CN'),
-    ranking: '[' + rankByValue.join(',') + ']',
-    edges: '{' + Object.entries(edges).map(([k,v]) => k + ':[' + v.join(',') + ']').join(',') + '}'
-  });
+  const rankStr = '[' + rankByValue.join(',') + ']';
+  const edgeStr = '{' + Object.entries(edges).map(([k,v]) => k + ':[' + v.join(',') + ']').join(',') + '}';
   
-  // Use image tag GET request - works everywhere, even WeChat
-  const img = new Image();
+  const url = SHEET_URL 
+    + '?name=' + encodeURIComponent(userName)
+    + '&date=' + encodeURIComponent(new Date().toLocaleDateString('zh-CN'))
+    + '&ranking=' + encodeURIComponent(rankStr)
+    + '&edges=' + encodeURIComponent(edgeStr);
+  
+  // DEBUG: show the URL so we can test manually
+  console.log('Submit URL:', url);
+  
+  // DEBUG: show clickable link
+  var debugEl = document.getElementById('debugLink');
+  if (!debugEl) {
+    debugEl = document.createElement('a');
+    debugEl.id = 'debugLink';
+    debugEl.style.cssText = 'display:block;font-size:11px;color:#2563eb;margin-top:12px;text-align:center;word-break:break-all';
+    debugEl.textContent = '如果提交失败，点击这里手动提交';
+    debugEl.target = '_blank';
+    document.getElementById('resultText').parentNode.appendChild(debugEl);
+  }
+  debugEl.href = url;
+  
+  var img = new Image();
   img.onload = function() {
     statusEl.textContent = '已提交 ✓';
     statusEl.style.color = '#16a34a';
   };
   img.onerror = function() {
-    // GAS returns text not image, so onerror fires but request still went through
+    // GAS returns text not image, so onerror fires but request went through
     statusEl.textContent = '已提交 ✓';
     statusEl.style.color = '#16a34a';
   };
-  img.src = SHEET_URL + '?' + params.toString();
+  img.src = url;
 }
 
 function copyResult() {
