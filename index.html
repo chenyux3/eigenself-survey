@@ -628,7 +628,7 @@ function showResult() {
   
   let text = `【EigenSelf 结果】\n`;
   text += `姓名：${userName}\n`;
-  text += `日期：${new Date().toLocaleDateString('zh-CN')}\n\n`;
+  text += `日期：${new Date().toLocaleString('zh-CN')}\n\n`;
   
   text += `=== 价值排序 ===\n`;
   for (let r = 0; r < ranking.length; r++) {
@@ -667,7 +667,7 @@ function submitToSheet(rankByValue) {
   
   const url = SHEET_URL 
     + '?name=' + encodeURIComponent(userName)
-    + '&date=' + encodeURIComponent(new Date().toLocaleDateString('zh-CN'))
+    + '&date=' + encodeURIComponent(new Date().toLocaleString('zh-CN'))
     + '&ranking=' + encodeURIComponent(rankStr)
     + '&edges=' + encodeURIComponent(edgeStr);
   
