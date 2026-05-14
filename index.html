@@ -658,29 +658,49 @@ function showResult() {
 function submitToSheet(rankByValue) {
   const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzbHObe1y1lk3-lLYNGveVgbq6Dk6OfUQhJBT8oZE2mWqVoynOSlH6ZbVNxy2IWGPifUA/exec';
   
-  const payload = {
+  const statusEl = document.getElementById('submitStatus');
+  statusEl.textContent = '正在提交...';
+  statusEl.style.color = '#999';
+  
+  // Use hidden iframe + form — the only reliable cross-origin method for GAS
+  const iframeName = 'eigenself_submit_' + Date.now();
+  const iframe = document.createElement('iframe');
+  iframe.name = iframeName;
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+  
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = SHEET_URL;
+  form.target = iframeName;
+  form.style.display = 'none';
+  
+  const fields = {
     name: userName,
     date: new Date().toLocaleDateString('zh-CN'),
     ranking: '[' + rankByValue.join(',') + ']',
     edges: '{' + Object.entries(edges).map(([k,v]) => k + ':[' + v.join(',') + ']').join(',') + '}'
   };
   
-  const statusEl = document.getElementById('submitStatus');
-  statusEl.textContent = '正在提交...';
-  statusEl.style.color = '#999';
+  for (const [key, val] of Object.entries(fields)) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = val;
+    form.appendChild(input);
+  }
   
-  fetch(SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload)
-  }).then(() => {
-    statusEl.textContent = '已自动提交 ✓';
+  document.body.appendChild(form);
+  form.submit();
+  
+  // Can't read iframe response cross-origin, so use a timeout
+  setTimeout(() => {
+    statusEl.textContent = '已提交 ✓';
     statusEl.style.color = '#16a34a';
-  }).catch(() => {
-    statusEl.textContent = '自动提交失败，请手动复制结果发给新';
-    statusEl.style.color = '#dc2626';
-  });
+    // Cleanup
+    try { document.body.removeChild(form); } catch(e) {}
+    try { document.body.removeChild(iframe); } catch(e) {}
+  }, 3000);
 }
 
 function copyResult() {
