@@ -376,11 +376,10 @@
         <div class="value-en" id="curValueEn"></div>
         <div class="value-desc" id="curValueDesc"></div>
       </div>
-      <div class="prompt-text">你会联想到下面哪些？</div>
+      <div class="prompt-text">你会联想到下面哪些？（选1-3个）</div>
       <div class="select-count" id="selectCount"></div>
       <div class="choice-grid" id="choiceGrid"></div>
       <button class="btn btn-primary" id="nextNetBtn" onclick="nextNetworkStep()" disabled>下一个</button>
-      <button class="btn btn-secondary" id="skipNetBtn" onclick="skipNetworkStep()">跳过（没有明显联想）</button>
     </div>
   </div>
   
@@ -482,7 +481,6 @@ function renderNetworkStep() {
   }
   
   document.getElementById('nextNetBtn').disabled = true;
-  document.getElementById('skipNetBtn').style.display = 'block';
   
   setProgress(5 + (currentNetIdx / 10) * 45);
 }
@@ -521,11 +519,6 @@ function nextNetworkStep() {
   if (selectedForCurrent.length > 0) {
     edges[currentNetIdx] = [...selectedForCurrent];
   }
-  advanceNetwork();
-}
-
-function skipNetworkStep() {
-  edges[currentNetIdx] = [];
   advanceNetwork();
 }
 
