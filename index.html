@@ -361,6 +361,8 @@
       <p>总共两步，大约 3 分钟。</p>
       <p style="font-size:13px;color:#aaa;margin-bottom:0">你的称呼（用于结果标注）</p>
       <input class="name-input" id="nameInput" placeholder="输入你的名字或昵称" maxlength="20">
+      <p style="font-size:13px;color:#aaa;margin-bottom:0">什么问题让你想做这个测试？</p>
+      <textarea class="name-input" id="intentInput" placeholder="比如：最近在纠结职业方向 / 想更了解自己 / 朋友推荐的，随便看看" maxlength="200" rows="2" style="resize:none;line-height:1.6"></textarea>
       <button class="btn btn-primary" onclick="startNetwork()" id="startBtn" disabled>开始</button>
     </div>
   </div>
@@ -426,6 +428,7 @@ const VALUES = [
 ];
 
 let userName = "";
+let userIntent = "";
 let edges = {};       // { 0: [2,3], 1: [0,4], ... }
 let ranking = [];     // [index, index, ...]
 let currentNetIdx = 0;
@@ -433,10 +436,14 @@ let selectedForCurrent = [];
 
 // --- Init ---
 const nameInput = document.getElementById('nameInput');
+const intentInput = document.getElementById('intentInput');
 const startBtn = document.getElementById('startBtn');
-nameInput.addEventListener('input', () => {
-  startBtn.disabled = nameInput.value.trim().length === 0;
-});
+
+function updateStartBtn() {
+  startBtn.disabled = nameInput.value.trim().length === 0 || intentInput.value.trim().length === 0;
+}
+nameInput.addEventListener('input', updateStartBtn);
+intentInput.addEventListener('input', updateStartBtn);
 
 function setProgress(pct) {
   document.getElementById('progress').style.width = pct + '%';
@@ -450,7 +457,8 @@ function showScreen(id) {
 // --- Network phase ---
 function startNetwork() {
   userName = nameInput.value.trim();
-  if (!userName) return;
+  userIntent = intentInput.value.trim();
+  if (!userName || !userIntent) return;
   currentNetIdx = 0;
   edges = {};
   showScreen('network');
@@ -621,6 +629,7 @@ function showResult() {
   
   let text = `【EigenSelf 结果】\n`;
   text += `姓名：${userName}\n`;
+  text += `来访问题：${userIntent}\n`;
   text += `日期：${new Date().toLocaleString('zh-CN')}\n\n`;
   
   text += `=== 价值排序 ===\n`;
@@ -660,6 +669,7 @@ function submitToSheet(rankByValue) {
   
   const url = SHEET_URL 
     + '?name=' + encodeURIComponent(userName)
+    + '&intent=' + encodeURIComponent(userIntent)
     + '&date=' + encodeURIComponent(new Date().toLocaleString('zh-CN'))
     + '&ranking=' + encodeURIComponent(rankStr)
     + '&edges=' + encodeURIComponent(edgeStr);
@@ -754,6 +764,7 @@ function resetAll() {
   currentNetIdx = 0;
   selectedForCurrent = [];
   nameInput.value = '';
+  intentInput.value = '';
   startBtn.disabled = true;
   setProgress(0);
   showScreen('intro');
