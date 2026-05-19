@@ -20,7 +20,28 @@
     max-width: 440px;
     margin: 0 auto;
     padding: 20px 16px 40px;
+    position: relative;
   }
+
+  /* Language toggle */
+  .lang-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 500;
+    border: 1.5px solid #ddd;
+    border-radius: 14px;
+    background: #fff;
+    color: #888;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    z-index: 50;
+  }
+  .lang-toggle:active { transform: scale(0.96); }
   
   /* Header */
   .header {
@@ -346,9 +367,10 @@
 </head>
 <body>
 <div class="app">
+  <button class="lang-toggle" id="langBtn" onclick="toggleLang()">English</button>
   <div class="header">
     <h1>EigenSelf</h1>
-    <p>发现你真实的价值观结构</p>
+    <p data-i18n="subtitle">10 个价值观，一个小练习</p>
   </div>
   
   <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
@@ -356,57 +378,56 @@
   <!-- Intro -->
   <div class="screen active" id="screen-intro">
     <div class="intro-card">
-      <h2>欢迎</h2>
-      <p>这个小测试会帮你画出自己的"价值观网络"——不只是你觉得什么重要，而是你实际上怎么思考这些价值观之间的关系。</p>
-      <p>总共两步，大约 3 分钟。</p>
-      <p style="font-size:13px;color:#aaa;margin-bottom:0">你的称呼（用于结果标注）</p>
-      <input class="name-input" id="nameInput" placeholder="输入你的名字或昵称" maxlength="20">
-      <p style="font-size:13px;color:#aaa;margin-bottom:0">什么问题让你想做这个测试？</p>
-      <textarea class="name-input" id="intentInput" placeholder="比如：最近在纠结职业方向 / 想更了解自己 / 朋友推荐的，随便看看" maxlength="200" rows="2" style="resize:none;line-height:1.6"></textarea>
-      <button class="btn btn-primary" onclick="startNetwork()" id="startBtn" disabled>开始</button>
+      <h2 data-i18n="introTitle">欢迎</h2>
+      <p data-i18n="introP1">两步，大约 3 分钟。凭感觉来，别想太多。两步不一定要一致——那才是这个练习有意思的地方。</p>
+      <p data-i18n="nameLabel" style="font-size:13px;color:#aaa;margin-bottom:0">你的称呼（用于结果标注）</p>
+      <input class="name-input" id="nameInput" data-i18n-ph="namePlaceholder" placeholder="输入你的名字或昵称" maxlength="20">
+      <p data-i18n="intentLabel" style="font-size:13px;color:#aaa;margin-bottom:0">什么问题让你想做这个测试？</p>
+      <textarea class="name-input" id="intentInput" data-i18n-ph="intentPlaceholder" placeholder="比如：最近在纠结职业方向 / 想更了解自己 / 朋友推荐的，随便看看" maxlength="200" rows="3" style="resize:none;line-height:1.6"></textarea>
+      <button class="btn btn-primary" onclick="startNetwork()" id="startBtn" data-i18n="startBtn" disabled>开始</button>
     </div>
   </div>
   
   <!-- Network phase -->
   <div class="screen" id="screen-network">
-    <div class="phase-label">第一步 · 联想网络</div>
+    <div class="phase-label" data-i18n="netPhase">第一步 · 联想网络</div>
     <div class="step-counter" id="netStep"></div>
     <div class="network-card">
       <div class="current-value">
-        <div class="label">当你想到</div>
+        <div class="label" data-i18n="whenYouThink">当你想到</div>
         <div class="value-name" id="curValueZh"></div>
         <div class="value-en" id="curValueEn"></div>
         <div class="value-desc" id="curValueDesc"></div>
       </div>
-      <div class="prompt-text">你会联想到下面哪些？（选1-3个）</div>
+      <div class="prompt-text" data-i18n="netPrompt">你会联想到下面哪些？（选1-3个）</div>
       <div class="select-count" id="selectCount"></div>
       <div class="choice-grid" id="choiceGrid"></div>
-      <button class="btn btn-primary" id="nextNetBtn" onclick="nextNetworkStep()" disabled>下一个</button>
+      <button class="btn btn-primary" id="nextNetBtn" onclick="nextNetworkStep()" data-i18n="nextBtn" disabled>下一个</button>
     </div>
   </div>
   
   <!-- Rank phase -->
   <div class="screen" id="screen-rank">
-    <div class="phase-label">第二步 · 重要性排序</div>
+    <div class="phase-label" data-i18n="rankPhase">第二步 · 重要性排序</div>
     <div class="rank-card">
-      <div class="rank-instruction">按重要程度依次点击<br>先点 = 最重要</div>
+      <div class="rank-instruction" data-i18n-html="rankInstruction">按重要程度依次点击<br>先点 = 最重要</div>
       <div class="rank-subtext" id="rankSubtext">点击你认为最重要的价值观</div>
       <div class="rank-list" id="rankList"></div>
-      <button class="btn btn-secondary" onclick="undoRank()" id="undoBtn" style="display:none">撤销上一步</button>
+      <button class="btn btn-secondary" onclick="undoRank()" id="undoBtn" data-i18n="undoBtn" style="display:none">撤销上一步</button>
     </div>
   </div>
   
   <!-- Result -->
   <div class="screen" id="screen-result">
     <div class="result-card">
-      <h2>完成 ✓</h2>
+      <h2 data-i18n="resultTitle">完成 ✓</h2>
       <p id="submitStatus" style="text-align:center;color:#999;font-size:13px;margin-bottom:8px"></p>
-      <p style="text-align:center;color:#888;font-size:13px;margin-bottom:16px">
+      <p data-i18n="resultHint" style="text-align:center;color:#888;font-size:13px;margin-bottom:16px">
         也可以把下面的结果复制发给新
       </p>
       <div class="result-text" id="resultText"></div>
-      <button class="btn btn-primary" onclick="copyResult()">复制结果</button>
-      <button class="btn btn-secondary" onclick="resetAll()">重新来一次</button>
+      <button class="btn btn-primary" onclick="copyResult()" data-i18n="copyBtn">复制结果</button>
+      <button class="btn btn-secondary" onclick="resetAll()" data-i18n="resetBtn">重新来一次</button>
     </div>
   </div>
 </div>
@@ -415,17 +436,133 @@
 
 <script>
 const VALUES = [
-  { zh: "自主", en: "Self-Direction", desc: "独立思考和行动的自由" },
-  { zh: "新鲜感", en: "Stimulation", desc: "追求新奇、挑战和探索" },
-  { zh: "享受", en: "Hedonism", desc: "享受生活中的愉悦和美好" },
-  { zh: "成就", en: "Achievement", desc: "通过努力获得认可和成功" },
-  { zh: "权力", en: "Power", desc: "对资源和他人的影响力" },
-  { zh: "安全", en: "Security", desc: "稳定、安全和可预测的生活" },
-  { zh: "守矩", en: "Conformity", desc: "克制自己以尊重社会规范" },
-  { zh: "传统", en: "Tradition", desc: "尊重和延续文化传承" },
-  { zh: "善待亲友", en: "Benevolence", desc: "关爱身边亲近的人" },
-  { zh: "博爱", en: "Universalism", desc: "包容和关怀所有人与世界" },
+  { zh: "自主", en: "Self-Direction", desc: "独立思考和行动的自由", descEn: "Freedom to think and act independently" },
+  { zh: "新鲜感", en: "Stimulation", desc: "追求新奇、挑战和探索", descEn: "Seeking novelty, challenge, and exploration" },
+  { zh: "享受", en: "Hedonism", desc: "享受生活中的愉悦和美好", descEn: "Enjoying pleasure and the good things in life" },
+  { zh: "成就", en: "Achievement", desc: "通过努力获得认可和成功", descEn: "Gaining recognition and success through effort" },
+  { zh: "权力", en: "Power", desc: "对资源和他人的影响力", descEn: "Influence over resources and other people" },
+  { zh: "安全", en: "Security", desc: "稳定、安全和可预测的生活", descEn: "A stable, safe, and predictable life" },
+  { zh: "守矩", en: "Conformity", desc: "克制自己以尊重社会规范", descEn: "Restraining oneself to respect social norms" },
+  { zh: "传统", en: "Tradition", desc: "尊重和延续文化传承", descEn: "Respecting and continuing cultural heritage" },
+  { zh: "善待亲友", en: "Benevolence", desc: "关爱身边亲近的人", descEn: "Caring for the people close to you" },
+  { zh: "博爱", en: "Universalism", desc: "包容和关怀所有人与世界", descEn: "Embracing and caring for all people and the world" },
 ];
+
+// --- i18n ---
+let lang = "zh";
+
+const I18N = {
+  zh: {
+    htmlLang: "zh",
+    toggleLabel: "English",
+    subtitle: "10 个价值观，一个小练习",
+    introTitle: "欢迎",
+    introP1: "两步，大约 3 分钟。凭感觉来，别想太多。两步不一定要一致——那才是这个练习有意思的地方。",
+    nameLabel: "你的称呼（用于结果标注）",
+    namePlaceholder: "输入你的名字或昵称",
+    intentLabel: "什么问题让你想做这个测试？",
+    intentPlaceholder: "比如：最近在纠结职业方向 / 想更了解自己 / 朋友推荐的，随便看看",
+    startBtn: "开始",
+    netPhase: "第一步 · 联想网络",
+    whenYouThink: "当你想到",
+    netPrompt: "你会联想到下面哪些？（选1-3个）",
+    nextBtn: "下一个",
+    rankPhase: "第二步 · 重要性排序",
+    rankInstruction: "按重要程度依次点击<br>先点 = 最重要",
+    undoBtn: "撤销上一步",
+    resultTitle: "完成 ✓",
+    resultHint: "也可以把下面的结果复制发给新",
+    copyBtn: "复制结果",
+    resetBtn: "重新来一次",
+    selectCount: n => `已选 ${n}/3`,
+    rankFirst: "点击你认为最重要的价值观",
+    rankNext: ord => `接下来选${ord}重要的`,
+    ordinals: ['第一','第二','第三','第四','第五','第六','第七','第八','第九','第十'],
+    submitting: "正在提交...",
+    submitted: "已提交 ✓",
+    debugLink: "如果提交失败，点击这里手动提交",
+    toastCopied: "已复制到剪贴板 ✓",
+    toastSelect: "已选中文字，请手动复制",
+    locale: "zh-CN",
+    rTitle: "【EigenSelf 结果】",
+    rName: "姓名",
+    rIntent: "来访问题",
+    rDate: "日期",
+    rRankHdr: "=== 价值排序 ===",
+    rNetHdr: "=== 联想网络 ===",
+    rNoAssoc: "（无联想）",
+    rRawHdr: "=== 原始数据 ===",
+    rSep: "、",
+  },
+  en: {
+    htmlLang: "en",
+    toggleLabel: "中文",
+    subtitle: "10 values · a short exercise",
+    introTitle: "Welcome",
+    introP1: "Two steps, about 3 minutes. Go with your gut — don't overthink it. The two steps don't have to agree — that's where this gets interesting.",
+    nameLabel: "Your name (used to label your result)",
+    namePlaceholder: "Enter your name or nickname",
+    intentLabel: "What question made you want to take this test?",
+    intentPlaceholder: "e.g. weighing a career change / wanting to understand myself better / a friend recommended it, just curious",
+    startBtn: "Start",
+    netPhase: "Step 1 · Association Network",
+    whenYouThink: "When you think of",
+    netPrompt: "Which of these come to mind? (pick 1-3)",
+    nextBtn: "Next",
+    rankPhase: "Step 2 · Importance Ranking",
+    rankInstruction: "Tap in order of importance<br>First tap = most important",
+    undoBtn: "Undo last step",
+    resultTitle: "Done ✓",
+    resultHint: "You can also copy the result below and send it back.",
+    copyBtn: "Copy result",
+    resetBtn: "Start over",
+    selectCount: n => `Selected ${n}/3`,
+    rankFirst: "Tap the value you think is most important",
+    rankNext: ord => `Now pick the ${ord} most important`,
+    ordinals: ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'],
+    submitting: "Submitting...",
+    submitted: "Submitted ✓",
+    debugLink: "If submission failed, tap here to submit manually",
+    toastCopied: "Copied to clipboard ✓",
+    toastSelect: "Text selected — please copy manually",
+    locale: "en-US",
+    rTitle: "[EigenSelf Result]",
+    rName: "Name",
+    rIntent: "What brings you here",
+    rDate: "Date",
+    rRankHdr: "=== Value Ranking ===",
+    rNetHdr: "=== Association Network ===",
+    rNoAssoc: "(no association)",
+    rRawHdr: "=== Raw Data ===",
+    rSep: ", ",
+  },
+};
+
+function vName(i) { return lang === "en" ? VALUES[i].en : VALUES[i].zh; }
+
+function applyLang() {
+  const t = I18N[lang];
+  document.documentElement.lang = t.htmlLang;
+  document.getElementById('langBtn').textContent = t.toggleLabel;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t[el.dataset.i18n];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    el.innerHTML = t[el.dataset.i18nHtml];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = t[el.dataset.i18nPh];
+  });
+  // Re-render whichever dynamic screen is active so its labels follow the language.
+  if (document.getElementById('screen-network').classList.contains('active')) renderNetworkStep();
+  else if (document.getElementById('screen-rank').classList.contains('active')) renderRankList();
+  else if (document.getElementById('screen-result').classList.contains('active')) showResult();
+}
+
+function toggleLang() {
+  lang = lang === "zh" ? "en" : "zh";
+  applyLang();
+}
 
 let userName = "";
 let userIntent = "";
@@ -433,6 +570,8 @@ let edges = {};       // { 0: [2,3], 1: [0,4], ... }
 let ranking = [];     // [index, index, ...]
 let currentNetIdx = 0;
 let selectedForCurrent = [];
+let resultSubmitted = false;   // guards against re-submitting on a language toggle
+let submitState = null;        // null | 'submitting' | 'submitted'
 
 // --- Init ---
 const nameInput = document.getElementById('nameInput');
@@ -444,6 +583,8 @@ function updateStartBtn() {
 }
 nameInput.addEventListener('input', updateStartBtn);
 intentInput.addEventListener('input', updateStartBtn);
+
+applyLang();
 
 function setProgress(pct) {
   document.getElementById('progress').style.width = pct + '%';
@@ -461,35 +602,43 @@ function startNetwork() {
   if (!userName || !userIntent) return;
   currentNetIdx = 0;
   edges = {};
+  selectedForCurrent = [];
   showScreen('network');
   renderNetworkStep();
   setProgress(5);
 }
 
 function renderNetworkStep() {
+  const isEn = lang === "en";
   const v = VALUES[currentNetIdx];
-  document.getElementById('curValueZh').textContent = v.zh;
-  document.getElementById('curValueEn').textContent = v.en;
-  document.getElementById('curValueDesc').textContent = v.desc;
+  document.getElementById('curValueZh').textContent = isEn ? v.en : v.zh;
+  document.getElementById('curValueEn').textContent = isEn ? '' : v.en;
+  document.getElementById('curValueDesc').textContent = isEn ? v.descEn : v.desc;
   document.getElementById('netStep').textContent = `${currentNetIdx + 1} / 10`;
-  
-  selectedForCurrent = [];
+
   updateSelectCount();
-  
+
   const grid = document.getElementById('choiceGrid');
   grid.innerHTML = '';
   for (let i = 0; i < VALUES.length; i++) {
     if (i === currentNetIdx) continue;
     const btn = document.createElement('div');
     btn.className = 'choice-btn';
-    btn.textContent = VALUES[i].zh;
+    btn.textContent = vName(i);
     btn.dataset.idx = i;
+    if (selectedForCurrent.includes(i)) btn.classList.add('selected');
     btn.addEventListener('click', () => toggleChoice(i, btn));
     grid.appendChild(btn);
   }
-  
-  document.getElementById('nextNetBtn').disabled = true;
-  
+  // Restore disabled state when 3 are already selected (e.g. after a language switch).
+  if (selectedForCurrent.length >= 3) {
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (!selectedForCurrent.includes(parseInt(b.dataset.idx))) b.classList.add('disabled');
+    });
+  }
+
+  document.getElementById('nextNetBtn').disabled = selectedForCurrent.length === 0;
+
   setProgress(5 + (currentNetIdx / 10) * 45);
 }
 
@@ -520,7 +669,7 @@ function toggleChoice(idx, btn) {
 
 function updateSelectCount() {
   const el = document.getElementById('selectCount');
-  el.textContent = `已选 ${selectedForCurrent.length}/3`;
+  el.textContent = I18N[lang].selectCount(selectedForCurrent.length);
 }
 
 function nextNetworkStep() {
@@ -535,6 +684,7 @@ function advanceNetwork() {
   if (currentNetIdx >= 10) {
     startRanking();
   } else {
+    selectedForCurrent = [];
     renderNetworkStep();
   }
 }
@@ -564,17 +714,18 @@ function renderRankList() {
     num.className = 'rank-num';
     num.textContent = isRanked ? (rankPos + 1) : '';
     
-    const zh = document.createElement('span');
-    zh.className = 'rank-zh';
-    zh.textContent = v.zh;
-    
-    const en = document.createElement('span');
-    en.className = 'rank-en';
-    en.textContent = v.en;
-    
+    const isEn = lang === "en";
+    const primary = document.createElement('span');
+    primary.className = 'rank-zh';
+    primary.textContent = isEn ? v.en : v.zh;
+
+    const secondary = document.createElement('span');
+    secondary.className = 'rank-en';
+    secondary.textContent = isEn ? '' : v.en;
+
     item.appendChild(num);
-    item.appendChild(zh);
-    item.appendChild(en);
+    item.appendChild(primary);
+    item.appendChild(secondary);
     
     if (!isRanked) {
       item.addEventListener('click', () => {
@@ -589,12 +740,12 @@ function renderRankList() {
   // Update subtext
   const sub = document.getElementById('rankSubtext');
   const undoBtn = document.getElementById('undoBtn');
+  const t = I18N[lang];
   if (ranking.length === 0) {
-    sub.textContent = '点击你认为最重要的价值观';
+    sub.textContent = t.rankFirst;
     undoBtn.style.display = 'none';
   } else if (ranking.length < 10) {
-    const ordinals = ['第一','第二','第三','第四','第五','第六','第七','第八','第九','第十'];
-    sub.textContent = `接下来选${ordinals[ranking.length]}重要的`;
+    sub.textContent = t.rankNext(t.ordinals[ranking.length]);
     undoBtn.style.display = 'block';
   }
   
@@ -627,43 +778,64 @@ function showResult() {
     rankByValue[ranking[r]] = r + 1;
   }
   
-  let text = `【EigenSelf 结果】\n`;
-  text += `姓名：${userName}\n`;
-  text += `来访问题：${userIntent}\n`;
-  text += `日期：${new Date().toLocaleString('zh-CN')}\n\n`;
-  
-  text += `=== 价值排序 ===\n`;
+  const tr = I18N[lang];
+  let text = `${tr.rTitle}\n`;
+  text += `${tr.rName}: ${userName}\n`;
+  text += `${tr.rIntent}: ${userIntent}\n`;
+  text += `${tr.rDate}: ${new Date().toLocaleString(tr.locale)}\n\n`;
+
+  text += `${tr.rRankHdr}\n`;
   for (let r = 0; r < ranking.length; r++) {
-    text += `${r+1}. ${VALUES[ranking[r]].zh}\n`;
+    text += `${r+1}. ${vName(ranking[r])}\n`;
   }
-  
-  text += `\n=== 联想网络 ===\n`;
+
+  text += `\n${tr.rNetHdr}\n`;
   for (let i = 0; i < 10; i++) {
     const targets = edges[i] || [];
     if (targets.length > 0) {
-      text += `${VALUES[i].zh} → ${targets.map(t => VALUES[t].zh).join('、')}\n`;
+      text += `${vName(i)} → ${targets.map(t => vName(t)).join(tr.rSep)}\n`;
     } else {
-      text += `${VALUES[i].zh} → （无联想）\n`;
+      text += `${vName(i)} → ${tr.rNoAssoc}\n`;
     }
   }
-  
-  text += `\n=== 原始数据 ===\n`;
+
+  text += `\n${tr.rRawHdr}\n`;
   text += `ranking: [${rankByValue.join(',')}]\n`;
   text += `edges: {${Object.entries(edges).map(([k,v]) => `${k}:[${v.join(',')}]`).join(',')}}\n`;
-  
+
   document.getElementById('resultText').textContent = text;
-  
-  // Auto-submit to Google Sheets
-  submitToSheet(rankByValue);
+
+  renderSubmitStatus();
+
+  // Auto-submit to Google Sheets — only once, not on a language re-render.
+  if (!resultSubmitted) {
+    resultSubmitted = true;
+    submitToSheet(rankByValue);
+  }
+}
+
+function renderSubmitStatus() {
+  const statusEl = document.getElementById('submitStatus');
+  const t = I18N[lang];
+  if (submitState === 'submitting') {
+    statusEl.textContent = t.submitting;
+    statusEl.style.color = '#999';
+  } else if (submitState === 'submitted') {
+    statusEl.textContent = t.submitted;
+    statusEl.style.color = '#16a34a';
+  } else {
+    statusEl.textContent = '';
+  }
+  const debugEl = document.getElementById('debugLink');
+  if (debugEl) debugEl.textContent = t.debugLink;
 }
 
 function submitToSheet(rankByValue) {
   const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzbHObe1y1lk3-lLYNGveVgbq6Dk6OfUQhJBT8oZE2mWqVoynOSlH6ZbVNxy2IWGPifUA/exec';
   
-  const statusEl = document.getElementById('submitStatus');
-  statusEl.textContent = '正在提交...';
-  statusEl.style.color = '#999';
-  
+  submitState = 'submitting';
+  renderSubmitStatus();
+
   const rankStr = '[' + rankByValue.join(',') + ']';
   const edgeStr = '{' + Object.entries(edges).map(([k,v]) => k + ':[' + v.join(',') + ']').join(',') + '}';
   
@@ -683,21 +855,21 @@ function submitToSheet(rankByValue) {
     debugEl = document.createElement('a');
     debugEl.id = 'debugLink';
     debugEl.style.cssText = 'display:block;font-size:11px;color:#2563eb;margin-top:12px;text-align:center;word-break:break-all';
-    debugEl.textContent = '如果提交失败，点击这里手动提交';
     debugEl.target = '_blank';
     document.getElementById('resultText').parentNode.appendChild(debugEl);
   }
+  debugEl.textContent = I18N[lang].debugLink;
   debugEl.href = url;
-  
+
   var img = new Image();
   img.onload = function() {
-    statusEl.textContent = '已提交 ✓';
-    statusEl.style.color = '#16a34a';
+    submitState = 'submitted';
+    renderSubmitStatus();
   };
   img.onerror = function() {
     // GAS returns text not image, so onerror fires but request went through
-    statusEl.textContent = '已提交 ✓';
-    statusEl.style.color = '#16a34a';
+    submitState = 'submitted';
+    renderSubmitStatus();
   };
   img.src = url;
 }
@@ -707,7 +879,7 @@ function copyResult() {
   
   // Method 1: Modern clipboard API
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板 ✓')).catch(() => fallbackCopy(text));
+    navigator.clipboard.writeText(text).then(() => showToast(I18N[lang].toastCopied)).catch(() => fallbackCopy(text));
     return;
   }
   
@@ -730,7 +902,7 @@ function fallbackCopy(text) {
   try {
     const ok = document.execCommand('copy');
     if (ok) {
-      showToast('已复制到剪贴板 ✓');
+      showToast(I18N[lang].toastCopied);
     } else {
       selectResultText();
     }
@@ -748,7 +920,7 @@ function selectResultText() {
   const sel = window.getSelection();
   sel.removeAllRanges();
   sel.addRange(range);
-  showToast('已选中文字，请手动复制');
+  showToast(I18N[lang].toastSelect);
 }
 
 function showToast(msg) {
@@ -763,6 +935,8 @@ function resetAll() {
   ranking = [];
   currentNetIdx = 0;
   selectedForCurrent = [];
+  resultSubmitted = false;
+  submitState = null;
   nameInput.value = '';
   intentInput.value = '';
   startBtn.disabled = true;
