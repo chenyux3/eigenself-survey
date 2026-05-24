@@ -379,7 +379,7 @@
   <div class="screen active" id="screen-intro">
     <div class="intro-card">
       <h2 data-i18n="introTitle">欢迎</h2>
-      <p data-i18n="introP1">两步，大约 3 分钟。凭感觉来，别想太多。两步不一定要一致——那才是这个练习有意思的地方。</p>
+      <p data-i18n="introP1">两步，大约 3 分钟。凭感觉来，别想太多。</p>
       <p data-i18n="nameLabel" style="font-size:13px;color:#aaa;margin-bottom:0">你的称呼（用于结果标注）</p>
       <input class="name-input" id="nameInput" data-i18n-ph="namePlaceholder" placeholder="输入你的名字或昵称" maxlength="20">
       <p data-i18n="intentLabel" style="font-size:13px;color:#aaa;margin-bottom:0">什么问题让你想做这个测试？</p>
@@ -422,10 +422,10 @@
     <div class="result-card">
       <h2 data-i18n="resultTitle">完成 ✓</h2>
       <p id="submitStatus" style="text-align:center;color:#999;font-size:13px;margin-bottom:8px"></p>
-      <p data-i18n="resultHint" style="text-align:center;color:#888;font-size:13px;margin-bottom:16px">
-        也可以把下面的结果复制发给新
-      </p>
       <div class="result-text" id="resultText"></div>
+      <p data-i18n="resultHint" style="text-align:center;color:#888;font-size:13px;margin:16px 0">
+        你将会收到一份报告。如需深度的职业报告，请将简历和职业相关问题发给新新（info@evostep.org）。其他任何问题或后续交流也欢迎联系。
+      </p>
       <button class="btn btn-primary" onclick="copyResult()" data-i18n="copyBtn">复制结果</button>
       <button class="btn btn-secondary" onclick="resetAll()" data-i18n="resetBtn">重新来一次</button>
     </div>
@@ -440,12 +440,12 @@ const VALUES = [
   { zh: "新鲜感", en: "Stimulation", desc: "追求新奇、挑战和探索", descEn: "Seeking novelty, challenge, and exploration" },
   { zh: "享受", en: "Hedonism", desc: "享受生活中的愉悦和美好", descEn: "Enjoying pleasure and the good things in life" },
   { zh: "成就", en: "Achievement", desc: "通过努力获得认可和成功", descEn: "Gaining recognition and success through effort" },
-  { zh: "权力", en: "Power", desc: "对资源和他人的影响力", descEn: "Influence over resources and other people" },
+  { zh: "权力", en: "Power", desc: "影响他人和资源，获得地位", descEn: "Influence over resources and other people" },
   { zh: "安全", en: "Security", desc: "稳定、安全和可预测的生活", descEn: "A stable, safe, and predictable life" },
-  { zh: "守矩", en: "Conformity", desc: "克制自己以尊重社会规范", descEn: "Restraining oneself to respect social norms" },
+  { zh: "守矩", en: "Conformity", desc: "尊重共同的规则和别人的期待", descEn: "Restraining oneself to respect social norms" },
   { zh: "传统", en: "Tradition", desc: "尊重和延续文化传承", descEn: "Respecting and continuing cultural heritage" },
   { zh: "善待亲友", en: "Benevolence", desc: "关爱身边亲近的人", descEn: "Caring for the people close to you" },
-  { zh: "博爱", en: "Universalism", desc: "包容和关怀所有人与世界", descEn: "Embracing and caring for all people and the world" },
+  { zh: "博爱", en: "Universalism", desc: "关心远方的人和这个世界", descEn: "Embracing and caring for all people and the world" },
 ];
 
 // --- i18n ---
@@ -457,7 +457,7 @@ const I18N = {
     toggleLabel: "English",
     subtitle: "10 个价值观，一个小练习",
     introTitle: "欢迎",
-    introP1: "两步，大约 3 分钟。凭感觉来，别想太多。两步不一定要一致——那才是这个练习有意思的地方。",
+    introP1: "两步，大约 3 分钟。凭感觉来，别想太多。",
     nameLabel: "你的称呼（用于结果标注）",
     namePlaceholder: "输入你的名字或昵称",
     intentLabel: "什么问题让你想做这个测试？",
@@ -471,7 +471,7 @@ const I18N = {
     rankInstruction: "按重要程度依次点击<br>先点 = 最重要",
     undoBtn: "撤销上一步",
     resultTitle: "完成 ✓",
-    resultHint: "也可以把下面的结果复制发给新",
+    resultHint: "你将会收到一份报告。如需深度的职业报告，请将简历和职业相关问题发给新新（info@evostep.org）。其他任何问题或后续交流也欢迎联系。",
     copyBtn: "复制结果",
     resetBtn: "重新来一次",
     selectCount: n => `已选 ${n}/3`,
@@ -485,7 +485,7 @@ const I18N = {
     toastSelect: "已选中文字，请手动复制",
     locale: "zh-CN",
     rTitle: "【EigenSelf 结果】",
-    rName: "姓名",
+    rName: "称呼",
     rIntent: "来访问题",
     rDate: "日期",
     rRankHdr: "=== 价值排序 ===",
@@ -499,7 +499,7 @@ const I18N = {
     toggleLabel: "中文",
     subtitle: "10 values · a short exercise",
     introTitle: "Welcome",
-    introP1: "Two steps, about 3 minutes. Go with your gut — don't overthink it. The two steps don't have to agree — that's where this gets interesting.",
+    introP1: "Two steps, about 3 minutes. Go with your gut — don't overthink it.",
     nameLabel: "Your name (used to label your result)",
     namePlaceholder: "Enter your name or nickname",
     intentLabel: "What question made you want to take this test?",
@@ -513,7 +513,7 @@ const I18N = {
     rankInstruction: "Tap in order of importance<br>First tap = most important",
     undoBtn: "Undo last step",
     resultTitle: "Done ✓",
-    resultHint: "You can also copy the result below and send it back.",
+    resultHint: "You'll receive a report. For a deeper career report, send your CV and a career question to 新新 at info@evostep.org. Same contact for any other questions or follow-up.",
     copyBtn: "Copy result",
     resetBtn: "Start over",
     selectCount: n => `Selected ${n}/3`,
@@ -784,12 +784,7 @@ function showResult() {
   text += `${tr.rIntent}: ${userIntent}\n`;
   text += `${tr.rDate}: ${new Date().toLocaleString(tr.locale)}\n\n`;
 
-  text += `${tr.rRankHdr}\n`;
-  for (let r = 0; r < ranking.length; r++) {
-    text += `${r+1}. ${vName(ranking[r])}\n`;
-  }
-
-  text += `\n${tr.rNetHdr}\n`;
+  text += `${tr.rNetHdr}\n`;
   for (let i = 0; i < 10; i++) {
     const targets = edges[i] || [];
     if (targets.length > 0) {
@@ -797,6 +792,11 @@ function showResult() {
     } else {
       text += `${vName(i)} → ${tr.rNoAssoc}\n`;
     }
+  }
+
+  text += `\n${tr.rRankHdr}\n`;
+  for (let r = 0; r < ranking.length; r++) {
+    text += `${r+1}. ${vName(ranking[r])}\n`;
   }
 
   text += `\n${tr.rRawHdr}\n`;
