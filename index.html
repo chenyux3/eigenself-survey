@@ -208,7 +208,69 @@
     opacity: 0.35;
     pointer-events: none;
   }
-  
+
+  /* Value reference panel (collapsible) */
+  .value-reference {
+    margin-bottom: 16px;
+    font-size: 12px;
+    border-top: 1px solid #f0eeea;
+    padding-top: 12px;
+  }
+  .value-reference summary {
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    list-style: none;
+    color: #aaa;
+    text-align: center;
+    padding: 4px 0;
+  }
+  .value-reference summary::-webkit-details-marker { display: none; }
+  .value-reference summary::before {
+    content: "▸ ";
+    font-size: 10px;
+    margin-right: 4px;
+  }
+  .value-reference[open] summary::before { content: "▾ "; }
+  .ref-list {
+    list-style: none;
+    margin-top: 8px;
+    padding: 0;
+  }
+  .ref-list li {
+    padding: 4px 0;
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .ref-list .ref-name {
+    font-weight: 500;
+    color: #666;
+    flex-shrink: 0;
+    min-width: 60px;
+    font-size: 12px;
+  }
+  .ref-list .ref-desc {
+    color: #999;
+    line-height: 1.5;
+    font-size: 12px;
+  }
+
+  /* Review (Tier 2) */
+  .review-title {
+    font-family: 'Noto Serif SC', Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  .review-body {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
   /* Rank step */
   .rank-card {
     background: #fff;
@@ -402,10 +464,26 @@
       <div class="prompt-text" data-i18n="netPrompt">你会联想到下面哪些？（选1-3个）</div>
       <div class="select-count" id="selectCount"></div>
       <div class="choice-grid" id="choiceGrid"></div>
+      <details class="value-reference">
+        <summary data-i18n="refToggle">不确定时可以看看</summary>
+        <ul class="ref-list" id="refList"></ul>
+      </details>
       <button class="btn btn-primary" id="nextNetBtn" onclick="nextNetworkStep()" data-i18n="nextBtn" disabled>下一个</button>
     </div>
   </div>
   
+  <!-- Review (Tier 2 — sparse drawer prompt; only shown when total edges ≤ 15) -->
+  <div class="screen" id="screen-review">
+    <div class="phase-label" data-i18n="reviewPhase">在提交之前</div>
+    <div class="network-card" style="text-align: center;">
+      <h2 class="review-title" data-i18n="reviewTitle">再看一眼？</h2>
+      <p class="review-body" data-i18n="reviewBody">如果有想再考虑的，可以再过一遍。没有的话也可以直接继续。</p>
+      <button class="btn btn-secondary" onclick="reviewRevisit()" data-i18n="reviewBtnRevisit" style="margin-top: 0;">想再过一遍</button>
+      <button class="btn btn-secondary" onclick="reviewCeiling()" data-i18n="reviewBtnCeiling">这 10 个价值不太能表达我想说的</button>
+      <button class="btn btn-secondary" onclick="reviewDone()" data-i18n="reviewBtnDone">就这样，继续</button>
+    </div>
+  </div>
+
   <!-- Rank phase -->
   <div class="screen" id="screen-rank">
     <div class="phase-label" data-i18n="rankPhase">第二步 · 重要性排序</div>
@@ -466,7 +544,14 @@ const I18N = {
     netPhase: "第一步 · 联想网络",
     whenYouThink: "当你想到",
     netPrompt: "你会联想到下面哪些？（选1-3个）",
+    refToggle: "不确定时可以看看",
     nextBtn: "下一个",
+    reviewPhase: "在提交之前",
+    reviewTitle: "再看一眼？",
+    reviewBody: "如果有想再考虑的，可以再过一遍。没有的话也可以直接继续。",
+    reviewBtnRevisit: "想再过一遍",
+    reviewBtnCeiling: "这 10 个价值不太能表达我想说的",
+    reviewBtnDone: "就这样，继续",
     rankPhase: "第二步 · 重要性排序",
     rankInstruction: "按重要程度依次点击<br>先点 = 最重要",
     undoBtn: "撤销上一步",
@@ -508,7 +593,14 @@ const I18N = {
     netPhase: "Step 1 · Association Network",
     whenYouThink: "When you think of",
     netPrompt: "Which of these come to mind? (pick 1-3)",
+    refToggle: "Open if you're not sure",
     nextBtn: "Next",
+    reviewPhase: "Before submitting",
+    reviewTitle: "One more look?",
+    reviewBody: "If there's anything you'd like to reconsider, you can go through again. Or just continue.",
+    reviewBtnRevisit: "Go through again",
+    reviewBtnCeiling: "These 10 values don't quite capture what I'd say",
+    reviewBtnDone: "I'm good, continue",
     rankPhase: "Step 2 · Importance Ranking",
     rankInstruction: "Tap in order of importance<br>First tap = most important",
     undoBtn: "Undo last step",
@@ -540,6 +632,26 @@ const I18N = {
 
 function vName(i) { return lang === "en" ? VALUES[i].en : VALUES[i].zh; }
 
+function renderRefList() {
+  const list = document.getElementById('refList');
+  if (!list) return;
+  const isEn = lang === "en";
+  list.innerHTML = '';
+  for (let i = 0; i < VALUES.length; i++) {
+    const v = VALUES[i];
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.className = 'ref-name';
+    name.textContent = isEn ? v.en : v.zh;
+    const desc = document.createElement('span');
+    desc.className = 'ref-desc';
+    desc.textContent = isEn ? v.descEn : v.desc;
+    li.appendChild(name);
+    li.appendChild(desc);
+    list.appendChild(li);
+  }
+}
+
 function applyLang() {
   const t = I18N[lang];
   document.documentElement.lang = t.htmlLang;
@@ -553,6 +665,7 @@ function applyLang() {
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     el.placeholder = t[el.dataset.i18nPh];
   });
+  renderRefList();
   // Re-render whichever dynamic screen is active so its labels follow the language.
   if (document.getElementById('screen-network').classList.contains('active')) renderNetworkStep();
   else if (document.getElementById('screen-rank').classList.contains('active')) renderRankList();
@@ -572,6 +685,8 @@ let currentNetIdx = 0;
 let selectedForCurrent = [];
 let resultSubmitted = false;   // guards against re-submitting on a language toggle
 let submitState = null;        // null | 'submitting' | 'submitted'
+let tier2Reviewed = false;     // true once the review screen has been shown this session
+let tier2Reason = null;        // null | 'revisited' | 'menu_ceiling' | 'done'
 
 // --- Init ---
 const nameInput = document.getElementById('nameInput');
@@ -682,10 +797,63 @@ function nextNetworkStep() {
 function advanceNetwork() {
   currentNetIdx++;
   if (currentNetIdx >= 10) {
-    startRanking();
+    // Tier 2: if total edges are low, offer a review screen once per session.
+    const totalEdges = Object.values(edges).reduce((sum, arr) => sum + arr.length, 0);
+    if (!tier2Reviewed && totalEdges <= 15) {
+      showReview();
+    } else {
+      startRanking();
+    }
   } else {
-    selectedForCurrent = [];
+    // Pre-populate from existing edges if present (supports revisit flow).
+    selectedForCurrent = edges[currentNetIdx] ? [...edges[currentNetIdx]] : [];
     renderNetworkStep();
+  }
+}
+
+// --- Review (Tier 2) ---
+function showReview() {
+  tier2Reviewed = true;
+  showScreen('review');
+  setProgress(50);
+}
+
+function reviewRevisit() {
+  tier2Reason = 'revisited';
+  logTier2(tier2Reason);
+  currentNetIdx = 0;
+  selectedForCurrent = edges[0] ? [...edges[0]] : [];
+  showScreen('network');
+  renderNetworkStep();
+}
+
+function reviewCeiling() {
+  tier2Reason = 'menu_ceiling';
+  logTier2(tier2Reason);
+  startRanking();
+}
+
+function reviewDone() {
+  tier2Reason = 'done';
+  logTier2(tier2Reason);
+  startRanking();
+}
+
+function logTier2(reason) {
+  const totalEdges = Object.values(edges).reduce((sum, arr) => sum + arr.length, 0);
+  console.log('Tier 2 reason:', reason, '| edges:', totalEdges, '| name:', userName);
+  try {
+    const key = 'eigenself_tier2_log';
+    const log = JSON.parse(localStorage.getItem(key) || '[]');
+    log.push({
+      timestamp: new Date().toISOString(),
+      name: userName,
+      reason: reason,
+      edgeCount: totalEdges,
+    });
+    localStorage.setItem(key, JSON.stringify(log));
+  } catch (e) {
+    // ignore localStorage quota / privacy errors
   }
 }
 
@@ -937,6 +1105,8 @@ function resetAll() {
   selectedForCurrent = [];
   resultSubmitted = false;
   submitState = null;
+  tier2Reviewed = false;
+  tier2Reason = null;
   nameInput.value = '';
   intentInput.value = '';
   startBtn.disabled = true;
