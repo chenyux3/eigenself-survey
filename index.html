@@ -495,17 +495,31 @@
     </div>
   </div>
   
-  <!-- Result -->
+  <!-- Email capture (Page A) -->
+  <div class="screen" id="screen-email">
+    <div class="phase-label" data-i18n="emailPhase">最后一步</div>
+    <div class="result-card">
+      <h2 data-i18n="emailTitle">报告写好后，发到哪里？</h2>
+      <p data-i18n="emailSub" style="text-align:center;color:#888;font-size:14px;margin:4px 0 14px">你的回答已经记录好了。</p>
+      <input class="name-input" id="emailInput" type="email" inputmode="email" autocomplete="email" data-i18n-ph="emailPlaceholder" placeholder="you@example.com" maxlength="100">
+      <p id="emailError" style="text-align:center;color:#dc2626;font-size:13px;min-height:18px;margin:4px 0 0"></p>
+      <button class="btn btn-primary" onclick="submitEmail()" id="emailSubmitBtn" data-i18n="emailBtn" disabled>提交</button>
+    </div>
+  </div>
+
+  <!-- Result / confirmation (Page B) -->
   <div class="screen" id="screen-result">
     <div class="result-card">
-      <h2 data-i18n="resultTitle">完成 ✓</h2>
+      <h2 data-i18n="resultTitle">收到 ✓</h2>
       <p id="submitStatus" style="text-align:center;color:#999;font-size:13px;margin-bottom:8px"></p>
-      <div class="result-text" id="resultText"></div>
-      <p data-i18n="resultHint" style="text-align:center;color:#888;font-size:13px;margin:16px 0">
-        你将会收到一份报告。如需深度的职业报告，请将简历和职业相关问题发给新新（info@evostep.org）。其他任何问题或后续交流也欢迎联系。
-      </p>
-      <button class="btn btn-primary" onclick="copyResult()" data-i18n="copyBtn">复制结果</button>
-      <button class="btn btn-secondary" onclick="resetAll()" data-i18n="resetBtn">重新来一次</button>
+      <p id="deliveryConfirm" style="text-align:center;font-size:15px;margin:8px 0"></p>
+      <p data-i18n="resultDelay" style="text-align:center;color:#888;font-size:13px;margin:8px 0">如果需要更长时间，我会发邮件告诉你新的预计送达时间。</p>
+      <p data-i18n="resultAbout" style="text-align:center;color:#666;font-size:14px;margin:14px 0">它会呈现你看重什么、这些价值如何彼此驱动 —— 一面你自己的价值镜像。</p>
+      <p data-i18n-html="resultMore" style="text-align:center;color:#888;font-size:13px;margin:8px 0">想多了解 EigenSelf，可以访问 <a href="https://eigenself.ai" target="_blank">eigenself.ai</a>。</p>
+      <p data-i18n="resultHint" style="text-align:center;color:#888;font-size:13px;margin:12px 0 0">如需深度的职业报告，请把简历和职业相关问题发给新新（info@evostep.org）。其他问题或后续交流也欢迎联系。</p>
+      <div class="result-text" id="resultText" style="display:none"></div>
+      <button class="btn btn-secondary" onclick="resetAll()" data-i18n="resetBtn" style="margin-top:14px">重新来一次</button>
+      <a id="fallbackToggle" onclick="toggleFallback()" style="display:block;font-size:12px;color:#bbb;text-align:center;margin-top:12px;cursor:pointer"></a>
     </div>
   </div>
 </div>
@@ -555,8 +569,19 @@ const I18N = {
     rankPhase: "第二步 · 重要性排序",
     rankInstruction: "按重要程度依次点击<br>先点 = 最重要",
     undoBtn: "撤销上一步",
-    resultTitle: "完成 ✓",
-    resultHint: "你将会收到一份报告。如需深度的职业报告，请将简历和职业相关问题发给新新（info@evostep.org）。其他任何问题或后续交流也欢迎联系。",
+    emailPhase: "最后一步",
+    emailTitle: "报告写好后，发到哪里？",
+    emailSub: "你的回答已经记录好了。",
+    emailPlaceholder: "you@example.com",
+    emailBtn: "提交",
+    emailInvalid: "请输入有效的邮箱地址",
+    resultTitle: "收到 ✓",
+    deliveryConfirm: email => `你的 EigenSelf 价值镜像报告会在一周内发到 ${email}。`,
+    resultDelay: "如果需要更长时间，我会发邮件告诉你新的预计送达时间。",
+    resultAbout: "它会呈现你看重什么、这些价值如何彼此驱动 —— 一面你自己的价值镜像。",
+    resultMore: '想多了解 EigenSelf，可以访问 <a href="https://eigenself.ai" target="_blank">eigenself.ai</a>。',
+    resultHint: "如需深度的职业报告，请把简历和职业相关问题发给新新（info@evostep.org）。其他问题或后续交流也欢迎联系。",
+    fallbackLink: "提交失败？点这里复制并手动提交",
     copyBtn: "复制结果",
     resetBtn: "重新来一次",
     selectCount: n => `已选 ${n}/3`,
@@ -604,8 +629,19 @@ const I18N = {
     rankPhase: "Step 2 · Importance Ranking",
     rankInstruction: "Tap in order of importance<br>First tap = most important",
     undoBtn: "Undo last step",
+    emailPhase: "Last step",
+    emailTitle: "Where should I send your report?",
+    emailSub: "Your responses are saved.",
+    emailPlaceholder: "you@example.com",
+    emailBtn: "Submit",
+    emailInvalid: "Please enter a valid email address",
     resultTitle: "Done ✓",
-    resultHint: "You'll receive a report. For a deeper career report, send your CV and a career question to 新新 at info@evostep.org. Same contact for any other questions or follow-up.",
+    deliveryConfirm: email => `Your EigenSelf Value Mirror report will arrive within a week at ${email}.`,
+    resultDelay: "If it needs longer, I'll email you a new estimated delivery date.",
+    resultAbout: "It shows what you care about and how those values drive each other — a mirror of your own values.",
+    resultMore: 'Curious about EigenSelf? Visit <a href="https://eigenself.ai" target="_blank">eigenself.ai</a>.',
+    resultHint: "For an in-depth career report, send your résumé and career questions to 新新 (info@evostep.org). Other questions or follow-ups are welcome too.",
+    fallbackLink: "Submission failed? Tap here to copy & submit manually",
     copyBtn: "Copy result",
     resetBtn: "Start over",
     selectCount: n => `Selected ${n}/3`,
@@ -679,6 +715,7 @@ function toggleLang() {
 
 let userName = "";
 let userIntent = "";
+let userEmail = "";
 let edges = {};       // { 0: [2,3], 1: [0,4], ... }
 let ranking = [];     // [index, index, ...]
 let currentNetIdx = 0;
@@ -698,6 +735,15 @@ function updateStartBtn() {
 }
 nameInput.addEventListener('input', updateStartBtn);
 intentInput.addEventListener('input', updateStartBtn);
+
+const emailInput = document.getElementById('emailInput');
+const emailSubmitBtn = document.getElementById('emailSubmitBtn');
+function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+function updateEmailBtn() {
+  emailSubmitBtn.disabled = !isValidEmail(emailInput.value.trim());
+  document.getElementById('emailError').textContent = '';
+}
+emailInput.addEventListener('input', updateEmailBtn);
 
 applyLang();
 
@@ -922,10 +968,27 @@ function renderRankList() {
 
 function onRankUpdate() {
   if (ranking.length >= 10) {
-    showResult();
+    showEmail();
   } else {
     renderRankList();
   }
+}
+
+// --- Email capture (Page A) ---
+function showEmail() {
+  setProgress(95);
+  showScreen('email');
+  emailInput.focus();
+}
+
+function submitEmail() {
+  const email = emailInput.value.trim();
+  if (!isValidEmail(email)) {
+    document.getElementById('emailError').textContent = I18N[lang].emailInvalid;
+    return;
+  }
+  userEmail = email;
+  showResult();
 }
 
 function undoRank() {
@@ -972,6 +1035,7 @@ function showResult() {
   text += `edges: {${Object.entries(edges).map(([k,v]) => `${k}:[${v.join(',')}]`).join(',')}}\n`;
 
   document.getElementById('resultText').textContent = text;
+  document.getElementById('deliveryConfirm').textContent = tr.deliveryConfirm(userEmail);
 
   renderSubmitStatus();
 
@@ -988,14 +1052,12 @@ function renderSubmitStatus() {
   if (submitState === 'submitting') {
     statusEl.textContent = t.submitting;
     statusEl.style.color = '#999';
-  } else if (submitState === 'submitted') {
-    statusEl.textContent = t.submitted;
-    statusEl.style.color = '#16a34a';
   } else {
+    // 'submitted' / null → blank; the page title "收到 ✓" already confirms receipt
     statusEl.textContent = '';
   }
-  const debugEl = document.getElementById('debugLink');
-  if (debugEl) debugEl.textContent = t.debugLink;
+  const fb = document.getElementById('fallbackToggle');
+  if (fb) fb.textContent = t.fallbackLink;
 }
 
 function submitToSheet(rankByValue) {
@@ -1006,40 +1068,49 @@ function submitToSheet(rankByValue) {
 
   const rankStr = '[' + rankByValue.join(',') + ']';
   const edgeStr = '{' + Object.entries(edges).map(([k,v]) => k + ':[' + v.join(',') + ']').join(',') + '}';
-  
-  const url = SHEET_URL 
-    + '?name=' + encodeURIComponent(userName)
-    + '&intent=' + encodeURIComponent(userIntent)
-    + '&date=' + encodeURIComponent(new Date().toLocaleString('zh-CN'))
-    + '&ranking=' + encodeURIComponent(rankStr)
-    + '&edges=' + encodeURIComponent(edgeStr);
-  
-  // DEBUG: show the URL so we can test manually
-  console.log('Submit URL:', url);
-  
-  // DEBUG: show clickable link
-  var debugEl = document.getElementById('debugLink');
-  if (!debugEl) {
-    debugEl = document.createElement('a');
-    debugEl.id = 'debugLink';
-    debugEl.style.cssText = 'display:block;font-size:11px;color:#2563eb;margin-top:12px;text-align:center;word-break:break-all';
-    debugEl.target = '_blank';
-    document.getElementById('resultText').parentNode.appendChild(debugEl);
-  }
-  debugEl.textContent = I18N[lang].debugLink;
-  debugEl.href = url;
 
-  var img = new Image();
-  img.onload = function() {
+  const params = new URLSearchParams({
+    name: userName,
+    email: userEmail,
+    intent: userIntent,
+    date: new Date().toLocaleString('zh-CN'),
+    ranking: rankStr,
+    edges: edgeStr,
+  });
+
+  // Primary path: sendBeacon survives a tab close, so the write isn't lost if
+  // the reader closes the page right after tapping submit. urlencoded body →
+  // Apps Script doPost reads e.parameter, same shape as the legacy doGet path.
+  let queued = false;
+  if (navigator.sendBeacon) {
+    try {
+      const blob = new Blob([params.toString()], { type: 'application/x-www-form-urlencoded' });
+      queued = navigator.sendBeacon(SHEET_URL, blob);
+    } catch (e) {
+      queued = false;
+    }
+  }
+
+  if (queued) {
+    submitState = 'submitted';
+    renderSubmitStatus();
+    return;
+  }
+
+  // Fallback: fire-and-forget image GET (legacy doGet path).
+  const img = new Image();
+  img.onload = img.onerror = function() {
     submitState = 'submitted';
     renderSubmitStatus();
   };
-  img.onerror = function() {
-    // GAS returns text not image, so onerror fires but request went through
-    submitState = 'submitted';
-    renderSubmitStatus();
-  };
-  img.src = url;
+  img.src = SHEET_URL + '?' + params.toString();
+}
+
+function toggleFallback() {
+  const el = document.getElementById('resultText');
+  const show = el.style.display === 'none';
+  el.style.display = show ? 'block' : 'none';
+  if (show) copyResult();
 }
 
 function copyResult() {
@@ -1109,6 +1180,11 @@ function resetAll() {
   tier2Reason = null;
   nameInput.value = '';
   intentInput.value = '';
+  userEmail = '';
+  emailInput.value = '';
+  emailSubmitBtn.disabled = true;
+  document.getElementById('emailError').textContent = '';
+  document.getElementById('resultText').style.display = 'none';
   startBtn.disabled = true;
   setProgress(0);
   showScreen('intro');
